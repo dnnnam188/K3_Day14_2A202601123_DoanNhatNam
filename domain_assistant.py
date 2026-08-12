@@ -248,9 +248,12 @@ class OpenAIGenerator:
         self.model = os.getenv("OPENAI_MODEL", "").strip()
         if not api_key:
             raise RuntimeError("OPENAI_API_KEY is missing from .env")
-        if not self.model:
-            raise RuntimeError("OPENAI_MODEL is missing from .env")
-        self.client = OpenAI(api_key=api_key)
+        base_url = os.getenv("OPENAI_BASE_URL", "").strip()
+        kwargs: dict[str, Any] = {"api_key": api_key}
+        if base_url:
+            kwargs["base_url"] = base_url
+        self.client = OpenAI(**kwargs)
+
         self.max_output_tokens = max_output_tokens
 
     def generate(self, prompt: str) -> str:
